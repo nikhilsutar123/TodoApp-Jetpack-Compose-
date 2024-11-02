@@ -6,7 +6,7 @@ import com.example.todoapp.util.Constants
 
 @Database(
     entities = [Todo::class],
-    version = Constants.databaseVersion
+    version = Constants.DATABASE_VERSION
 )
 abstract class TodoDatabase : RoomDatabase() {
 

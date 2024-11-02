@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.todoapp.data.Todo
 
 @Composable
-fun TodoListScreen(
+fun TodoListItem(
     todo: Todo,
     onEvent: (TodoListEvent) -> Unit,
     modifier: Modifier = Modifier

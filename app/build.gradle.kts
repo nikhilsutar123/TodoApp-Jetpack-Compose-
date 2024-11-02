@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.hilt.android)
     //findKaptConfiguration(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.lifecycle.viewmodel)
+    implementation(libs.androidx.hilt.navigation.compose)
    // findKaptConfiguration(libs.androidx.hilt.compiler)
     // Room
     implementation(libs.androidx.room.runtime)

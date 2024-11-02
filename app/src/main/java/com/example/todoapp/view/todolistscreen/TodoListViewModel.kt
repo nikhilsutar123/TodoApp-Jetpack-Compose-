@@ -7,11 +7,13 @@ import com.example.todoapp.data.TodoRepository
 import com.example.todoapp.util.Constants
 import com.example.todoapp.util.Routes
 import com.example.todoapp.util.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class TodoListViewModel @Inject constructor(
     private val repository: TodoRepository
 ) : ViewModel() {
@@ -25,7 +27,7 @@ class TodoListViewModel @Inject constructor(
     fun onEvent(event: TodoListEvent) {
         when (event) {
             is TodoListEvent.OnTodoClick -> {
-                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?todoId = ${event.todo.id}"))
+                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?${Constants.TODO_ID_ARG} = ${event.todo.id}"))
             }
 
             is TodoListEvent.OnAddTodoClick -> {
@@ -38,8 +40,8 @@ class TodoListViewModel @Inject constructor(
                     repository.deleteTodo(event.todo)
                     sendUiEvent(
                         UiEvent.ShowSnackBar(
-                            message = Constants.todoDeleteMsg,
-                            action = Constants.todoDeleteAction
+                            message = Constants.TODO_DELETE_MSG,
+                            action = Constants.TODO_DELETE_ACTION
                         )
                     )
                 }
