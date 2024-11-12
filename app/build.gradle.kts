@@ -68,10 +68,10 @@ dependencies {
 
     //Dagger - Hilt
     implementation(libs.hilt.android)
-    //findKaptConfiguration(libs.hilt.android.compiler)
+    findKaptConfiguration(libs.hilt.android.compiler.toString())
     implementation(libs.androidx.hilt.lifecycle.viewmodel)
     implementation(libs.androidx.hilt.navigation.compose)
-   // findKaptConfiguration(libs.androidx.hilt.compiler)
+   //findKaptConfiguration(libs.androidx.hilt.compiler.toString())
     // Room
     implementation(libs.androidx.room.runtime)
    // findKaptConfiguration(libs.androidx.room.compiler)
