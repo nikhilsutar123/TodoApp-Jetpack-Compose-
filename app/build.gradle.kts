@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin.Companion.findK
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -16,6 +18,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -53,7 +56,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.multidex)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -67,14 +70,14 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //Dagger - Hilt
-    implementation(libs.hilt.android)
-    findKaptConfiguration(libs.hilt.android.compiler.toString())
-    implementation(libs.androidx.hilt.lifecycle.viewmodel)
-    implementation(libs.androidx.hilt.navigation.compose)
-   //findKaptConfiguration(libs.androidx.hilt.compiler.toString())
+    implementation(libs.hilt.android.v2511)
+    kapt(libs.hilt.android.compiler.v2511)
+
+    implementation(libs.androidx.hilt.navigation.compose.v110alpha01)
+
     // Room
     implementation(libs.androidx.room.runtime)
-   // findKaptConfiguration(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
 
     // Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)

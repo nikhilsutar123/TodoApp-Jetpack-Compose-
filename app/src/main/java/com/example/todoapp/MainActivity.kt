@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             TodoAppTheme {
-                val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = Routes.TODO_LIST) {
                     composable(Routes.TODO_LIST) {
                         TodoListScreen(onNavigate = {

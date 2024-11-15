@@ -51,7 +51,7 @@ fun AddEditTodoScreen(
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp), floatingActionButton = {
-        FloatingActionButton(onClick = { AddEditTodoEvent.OnSaveTodoClick }) {
+        FloatingActionButton(onClick = { viewModel.onEvent(AddEditTodoEvent.OnSaveTodoClick) }) {
             Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
         }
     }) {

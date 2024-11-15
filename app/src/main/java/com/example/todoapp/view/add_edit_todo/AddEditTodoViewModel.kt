@@ -11,6 +11,8 @@ import com.example.todoapp.data.TodoRepository
 import com.example.todoapp.util.Constants
 import com.example.todoapp.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -58,7 +60,7 @@ class AddEditTodoViewModel @Inject constructor(
             }
 
             is AddEditTodoEvent.OnSaveTodoClick -> {
-                viewModelScope.launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     if (title.isBlank()) {
                         sendUiEvent(
                             UiEvent.ShowSnackBar(
@@ -75,7 +77,7 @@ class AddEditTodoViewModel @Inject constructor(
                             id = todo?.id
                         )
                     )
-
+                    println("data added ${todo?.id}")
                     sendUiEvent(UiEvent.PopBackStack)
                 }
             }
