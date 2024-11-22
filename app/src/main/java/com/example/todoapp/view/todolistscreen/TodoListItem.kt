@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.todoapp.data.Todo
 
 @Composable
@@ -29,14 +32,24 @@ fun TodoListItem(
     modifier: Modifier = Modifier
 ) {
     Card(
+        modifier = modifier,
         shape = RoundedCornerShape(10.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
     ) {
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceEvenly) {
-            Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
                     text = todo.title,
-                    fontSize = TextUnit(value = 20f, type = TextUnitType.Sp)
+                    fontSize = 20.sp
                 )
                 Checkbox(
                     checked = todo.isDone,
@@ -57,9 +70,9 @@ fun TodoListItem(
                 )
             }
             HorizontalDivider(
-                thickness = 10.dp,
+                thickness = 1.dp,
                 color = Color.DarkGray,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             )
             TextButton(onClick = {
                 onEvent(TodoListEvent.OnDeleteTodoClick(todo))

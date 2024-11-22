@@ -69,13 +69,14 @@ class AddEditTodoViewModel @Inject constructor(
                         )
                         return@launch
                     }
+                    val newTodo = Todo(
+                        title = title,
+                        desc = desc,
+                        isDone = todo?.isDone ?: false,
+                        id = todo?.id
+                    )
                     repository.insertTodo(
-                        Todo(
-                            title = title,
-                            desc = desc,
-                            isDone = todo?.isDone ?: false,
-                            id = todo?.id
-                        )
+                        newTodo
                     )
                     println("data added ${todo?.id}")
                     sendUiEvent(UiEvent.PopBackStack)

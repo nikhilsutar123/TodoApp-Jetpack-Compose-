@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +28,8 @@ fun TodoListScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: TodoListViewModel = hiltViewModel()
 ) {
-    val todos = viewModel.todos.collectAsState(initial = emptyList())
+    val todos by viewModel.todos.collectAsState(initial = emptyList())
+    print("list $todos")
     val snackBarHostState = remember {
         SnackbarHostState()
     }
@@ -62,7 +64,8 @@ fun TodoListScreen(
                 .padding(it)
                 .fillMaxSize()
         ) {
-            items(todos.value) { todo ->
+            println("LazyColumn recomposed with todos: $todos")
+            items(todos) { todo ->
                 TodoListItem(
                     todo = todo,
                     onEvent = viewModel::onEvent,

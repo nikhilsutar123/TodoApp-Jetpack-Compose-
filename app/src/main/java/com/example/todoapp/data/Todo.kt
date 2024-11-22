@@ -8,5 +8,5 @@ data class Todo(
     val title: String,
     val desc: String?,
     val isDone: Boolean,
-    @PrimaryKey val id: Int? = null
+    @PrimaryKey(autoGenerate = true) val id: Int? = null
 )
