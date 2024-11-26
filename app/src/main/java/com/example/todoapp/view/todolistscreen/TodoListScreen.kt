@@ -29,7 +29,6 @@ fun TodoListScreen(
     viewModel: TodoListViewModel = hiltViewModel()
 ) {
     val todos by viewModel.todos.collectAsState(initial = emptyList())
-    print("list $todos")
     val snackBarHostState = remember {
         SnackbarHostState()
     }
@@ -71,6 +70,7 @@ fun TodoListScreen(
                     onEvent = viewModel::onEvent,
                     modifier = Modifier
                         .clickable {
+                            println("data ${todo.id}, ${todo.title}")
                             viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
                         }
                         .fillMaxWidth()

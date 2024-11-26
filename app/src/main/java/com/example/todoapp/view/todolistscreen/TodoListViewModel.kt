@@ -1,6 +1,8 @@
 package com.example.todoapp.view.todolistscreen
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.data.Todo
 import com.example.todoapp.data.TodoRepository
@@ -11,6 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,29 +22,44 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodoListViewModel @Inject constructor(
-    private val repository: TodoRepository
+    private val repository: TodoRepository,
 ) : ViewModel() {
     val todos = repository.getTodos()
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    private var deletedTodo: Todo? = null
+    private val _deletedTodo = MutableStateFlow<Todo?>(null)
+    val deletedTodo: StateFlow<Todo?> = _deletedTodo
 
     fun onEvent(event: TodoListEvent) {
+        val savedStateHandle: SavedStateHandle? = null
         when (event) {
             is TodoListEvent.OnTodoClick -> {
-                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?${Constants.TODO_ID_ARG} = ${event.todo.id}"))
+                savedStateHandle?.set(Constants.TODO_ID_ARG, event.todo.id)
+                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?${Constants.TODO_ID_ARG}=${event.todo.id}"))
             }
 
             is TodoListEvent.OnAddTodoClick -> {
-                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
+                viewModelScope.launch {
+                    val todo = deletedTodo.value
+                    if (todo != null) {
+                        sendUiEvent(
+                            UiEvent.Navigate(
+                                Routes.ADD_EDIT_TODO +
+                                        "?${Constants.TODO_ID_ARG}=${todo.id}"
+                            )
+                        )
+                    } else {
+                        sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
+                    }
+                }
             }
 
             is TodoListEvent.OnDeleteTodoClick -> {
                 viewModelScope.launch {
-                    deletedTodo = event.todo
                     repository.deleteTodo(event.todo)
+                    _deletedTodo.value = event.todo
                     sendUiEvent(
                         UiEvent.ShowSnackBar(
                             message = Constants.TODO_DELETE_MSG,
@@ -61,8 +80,8 @@ class TodoListViewModel @Inject constructor(
             }
 
             TodoListEvent.OnUndoDeleteClick -> {
-                deletedTodo?.let { todo ->
-                    viewModelScope.launch { repository.insertTodo(todo) }
+                deletedTodo.let { todo ->
+                    viewModelScope.launch { repository.insertTodo(todo.value!!) }
                 }
             }
         }

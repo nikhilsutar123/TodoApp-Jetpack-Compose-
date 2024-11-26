@@ -54,8 +54,9 @@ fun AddEditTodoScreen(
         FloatingActionButton(onClick = { viewModel.onEvent(AddEditTodoEvent.OnSaveTodoClick) }) {
             Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
         }
-    }) {
-        Column(modifier = Modifier.padding(it)) {
+    }) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            println("in addEditTodoScreen -> ${viewModel.title}, ${viewModel.desc}")
             TextField(
                 value = viewModel.title,
                 onValueChange = { viewModel.onEvent(AddEditTodoEvent.OnTitleChange(it)) },
