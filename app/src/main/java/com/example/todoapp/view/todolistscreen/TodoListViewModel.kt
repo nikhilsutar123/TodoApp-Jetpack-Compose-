@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -32,6 +33,10 @@ class TodoListViewModel @Inject constructor(
     private val _deletedTodo = MutableStateFlow<Todo?>(null)
     val deletedTodo: StateFlow<Todo?> = _deletedTodo
 
+    init {
+        println("deleted todo in init... ${_deletedTodo.value}")
+    }
+
     fun onEvent(event: TodoListEvent) {
         val savedStateHandle: SavedStateHandle? = null
         when (event) {
@@ -42,17 +47,9 @@ class TodoListViewModel @Inject constructor(
 
             is TodoListEvent.OnAddTodoClick -> {
                 viewModelScope.launch {
-                    val todo = deletedTodo.value
-                    if (todo != null) {
-                        sendUiEvent(
-                            UiEvent.Navigate(
-                                Routes.ADD_EDIT_TODO +
-                                        "?${Constants.TODO_ID_ARG}=${todo.id}"
-                            )
-                        )
-                    } else {
-                        sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
-                    }
+                    val todo = _deletedTodo.value
+                    sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
+
                 }
             }
 
@@ -60,6 +57,8 @@ class TodoListViewModel @Inject constructor(
                 viewModelScope.launch {
                     repository.deleteTodo(event.todo)
                     _deletedTodo.value = event.todo
+                    println("_deleted todo ${_deletedTodo.value!!.title}")
+
                     sendUiEvent(
                         UiEvent.ShowSnackBar(
                             message = Constants.TODO_DELETE_MSG,
