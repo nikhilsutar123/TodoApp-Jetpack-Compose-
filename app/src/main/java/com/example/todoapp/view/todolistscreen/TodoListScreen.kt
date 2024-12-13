@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
@@ -37,9 +38,12 @@ fun TodoListScreen(
         SnackbarHostState()
     }
     LaunchedEffect(key1 = true) {
+        println("LaunchedEffect triggered")
         viewModel.uiEvent.collect { event ->
+            println("UiEvent collected in LaunchedEffect: $event")
             when (event) {
                 is UiEvent.ShowSnackBar -> {
+                    println("Showing Snackbar: ${event.message}")
                     val result = snackBarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = event.action
@@ -49,15 +53,23 @@ fun TodoListScreen(
                     }
                 }
 
-                is UiEvent.Navigate -> (onNavigate(event))
+                is UiEvent.Navigate -> {
+                    println("Navigation event: ${event.route}")
+                    (onNavigate(event))
+                }
+
                 else -> Unit
             }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.onEvent(TodoListEvent.OnAddTodoClick) }) {
+            FloatingActionButton(onClick = {
+                println("fab for add todo clicked...")
+                viewModel.onEvent(TodoListEvent.OnAddTodoClick)
+            }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         }

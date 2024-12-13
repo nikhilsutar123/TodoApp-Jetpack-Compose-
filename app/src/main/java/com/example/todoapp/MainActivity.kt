@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
                             navController.navigate(it.route)
                         })
                     }
-                    composable(Routes.ADD_EDIT_TODO + "?${Constants.TODO_ID_ARG}={${Constants.TODO_ID_ARG}}",
+                    composable(Routes.ADD_EDIT_TODO +
+                            "?${Constants.TODO_ID_ARG}={${Constants.TODO_ID_ARG}}",
                         arguments = listOf(
                             navArgument(
                                 name = Constants.TODO_ID_ARG

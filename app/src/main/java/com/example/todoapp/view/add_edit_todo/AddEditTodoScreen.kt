@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -39,7 +41,8 @@ fun AddEditTodoScreen(
                 is UiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(
                         message = event.message,
-                        actionLabel = event.action
+                        actionLabel = event.action,
+                        duration = SnackbarDuration.Short
                     )
                 }
 
@@ -50,11 +53,13 @@ fun AddEditTodoScreen(
     }
     Scaffold(modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp), floatingActionButton = {
-        FloatingActionButton(onClick = { viewModel.onEvent(AddEditTodoEvent.OnSaveTodoClick) }) {
-            Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
-        }
-    }) { paddingValues ->
+        .padding(16.dp),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { viewModel.onEvent(AddEditTodoEvent.OnSaveTodoClick) }) {
+                Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+            }
+        }) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             println("in addEditTodoScreen -> ${viewModel.title}, ${viewModel.desc}")
             TextField(

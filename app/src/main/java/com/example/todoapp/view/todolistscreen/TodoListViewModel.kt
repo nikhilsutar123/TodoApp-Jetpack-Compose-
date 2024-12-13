@@ -27,7 +27,7 @@ class TodoListViewModel @Inject constructor(
 ) : ViewModel() {
     val todos = repository.getTodos()
 
-    private val _uiEvent = Channel<UiEvent>()
+    private val _uiEvent = Channel<UiEvent>(Channel.UNLIMITED)
     val uiEvent = _uiEvent.receiveAsFlow()
 
     private val _deletedTodo = MutableStateFlow<Todo?>(null)
@@ -47,10 +47,11 @@ class TodoListViewModel @Inject constructor(
 
             is TodoListEvent.OnAddTodoClick -> {
                 viewModelScope.launch {
-                    val todo = _deletedTodo.value
+                    println("in viewmodel - onAddTodoClick")
                     sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
-
+                    println("Navigating to ADD_EDIT_TODO")
                 }
+
             }
 
             is TodoListEvent.OnDeleteTodoClick -> {
@@ -88,6 +89,7 @@ class TodoListViewModel @Inject constructor(
 
     private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
+            println("UiEvent emitted: $event")
             _uiEvent.send(event)
         }
     }
