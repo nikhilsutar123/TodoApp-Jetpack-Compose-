@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -26,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.todoapp.util.UiEvent
+import kotlinx.coroutines.launch
 
 @Composable
 fun TodoListScreen(
@@ -37,25 +40,25 @@ fun TodoListScreen(
     val snackBarHostState = remember {
         SnackbarHostState()
     }
-    LaunchedEffect(key1 = true) {
-        println("LaunchedEffect triggered")
+    LaunchedEffect(key1 = viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
-            println("UiEvent collected in LaunchedEffect: $event")
             when (event) {
                 is UiEvent.ShowSnackBar -> {
-                    println("Showing Snackbar: ${event.message}")
-                    val result = snackBarHostState.showSnackbar(
-                        message = event.message,
-                        actionLabel = event.action
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.onEvent(TodoListEvent.OnUndoDeleteClick)
+                    launch {
+                        val result = snackBarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.action,
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.onEvent(TodoListEvent.OnUndoDeleteClick)
+                        }
                     }
                 }
 
                 is UiEvent.Navigate -> {
                     println("Navigation event: ${event.route}")
-                    (onNavigate(event))
+                    onNavigate(event)
                 }
 
                 else -> Unit
@@ -67,7 +70,6 @@ fun TodoListScreen(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                println("fab for add todo clicked...")
                 viewModel.onEvent(TodoListEvent.OnAddTodoClick)
             }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
@@ -93,14 +95,12 @@ fun TodoListScreen(
                     .padding(it)
                     .fillMaxSize()
             ) {
-                println("LazyColumn recomposed with todos: $todos")
                 items(todos) { todo ->
                     TodoListItem(
                         todo = todo,
                         onEvent = viewModel::onEvent,
                         modifier = Modifier
                             .clickable {
-                                println("data ${todo.id}, ${todo.title}")
                                 viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
                             }
                             .fillMaxWidth()

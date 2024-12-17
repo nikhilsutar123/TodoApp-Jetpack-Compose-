@@ -14,8 +14,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,29 +29,25 @@ class TodoListViewModel @Inject constructor(
 ) : ViewModel() {
     val todos = repository.getTodos()
 
-    private val _uiEvent = Channel<UiEvent>(Channel.UNLIMITED)
-    val uiEvent = _uiEvent.receiveAsFlow()
+    private val _uiEvent = MutableSharedFlow<UiEvent>(extraBufferCapacity = 1)
+    val uiEvent = _uiEvent.asSharedFlow()
 
     private val _deletedTodo = MutableStateFlow<Todo?>(null)
     val deletedTodo: StateFlow<Todo?> = _deletedTodo
 
-    init {
-        println("deleted todo in init... ${_deletedTodo.value}")
-    }
 
     fun onEvent(event: TodoListEvent) {
         val savedStateHandle: SavedStateHandle? = null
         when (event) {
             is TodoListEvent.OnTodoClick -> {
                 savedStateHandle?.set(Constants.TODO_ID_ARG, event.todo.id)
-                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?${Constants.TODO_ID_ARG}=${event.todo.id}"))
+                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO +
+                        "?${Constants.TODO_ID_ARG}=${event.todo.id}"))
             }
 
             is TodoListEvent.OnAddTodoClick -> {
                 viewModelScope.launch {
-                    println("in viewmodel - onAddTodoClick")
                     sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
-                    println("Navigating to ADD_EDIT_TODO")
                 }
 
             }
@@ -58,12 +56,11 @@ class TodoListViewModel @Inject constructor(
                 viewModelScope.launch {
                     repository.deleteTodo(event.todo)
                     _deletedTodo.value = event.todo
-                    println("_deleted todo ${_deletedTodo.value!!.title}")
 
                     sendUiEvent(
                         UiEvent.ShowSnackBar(
                             message = Constants.TODO_DELETE_MSG,
-                            action = Constants.TODO_DELETE_ACTION
+                            action = Constants.TODO_DELETE_ACTION,
                         )
                     )
                 }
@@ -89,8 +86,7 @@ class TodoListViewModel @Inject constructor(
 
     private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
-            println("UiEvent emitted: $event")
-            _uiEvent.send(event)
+            _uiEvent.emit(event)
         }
     }
 }
