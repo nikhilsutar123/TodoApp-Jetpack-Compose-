@@ -2,6 +2,7 @@ package com.example.todoapp.view.todolistscreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,12 +25,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.util.UiEvent
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @Composable
 fun TodoListScreen(
@@ -80,7 +85,7 @@ fun TodoListScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(it),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -90,22 +95,39 @@ fun TodoListScreen(
                 )
             }
         } else
-            LazyColumn(
+            Column(
                 modifier = Modifier
-                    .padding(it)
+                    .padding(16.dp)
                     .fillMaxSize()
             ) {
-                items(todos) { todo ->
-                    TodoListItem(
-                        todo = todo,
-                        onEvent = viewModel::onEvent,
-                        modifier = Modifier
-                            .clickable {
-                                viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
-                            }
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    )
+                Text(
+                    text = "Todos",
+                    textAlign = TextAlign.Start,
+                    fontSize = TextUnit(value = 24f, type = TextUnitType.Sp),
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                LazyColumn(modifier = Modifier.padding(it)) {
+                    items(todos) { todo ->
+                        val bgColor = remember {
+                            Color(
+                                red = Random.nextFloat() * 0.5f + 0.5f,
+                                green = Random.nextFloat() * 0.5f + 0.5f,
+                                blue = Random.nextFloat() * 0.5f + 0.5f,
+                                alpha = 1f
+                            )
+                        }
+                        TodoListItem(
+                            todo = todo,
+                            onEvent = viewModel::onEvent,
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
+                                }
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            backgroundColor = bgColor
+                        )
+                    }
                 }
             }
 
