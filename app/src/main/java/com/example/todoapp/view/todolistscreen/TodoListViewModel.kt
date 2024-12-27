@@ -40,14 +40,23 @@ class TodoListViewModel @Inject constructor(
         val savedStateHandle: SavedStateHandle? = null
         when (event) {
             is TodoListEvent.OnTodoClick -> {
+                savedStateHandle?.set(Constants.PURPOSE_ARG, "edit")
                 savedStateHandle?.set(Constants.TODO_ID_ARG, event.todo.id)
-                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO +
-                        "?${Constants.TODO_ID_ARG}=${event.todo.id}"))
+                val route  = Routes.ADD_EDIT_TODO +
+                        "?${Constants.TODO_ID_ARG}=${event.todo.id}&${Constants.PURPOSE_ARG}=edit"
+                println("Generated route: $route")
+                sendUiEvent(
+                    UiEvent.Navigate(
+                        Routes.ADD_EDIT_TODO +
+                                "?${Constants.TODO_ID_ARG}=${event.todo.id}&${Constants.PURPOSE_ARG}=edit"
+                    )
+                )
             }
 
             is TodoListEvent.OnAddTodoClick -> {
+                savedStateHandle?.set(Constants.PURPOSE_ARG, "add")
                 viewModelScope.launch {
-                    sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
+                    sendUiEvent(UiEvent.Navigate("${Routes.ADD_EDIT_TODO}?${Constants.PURPOSE_ARG}=add"))
                 }
 
             }
