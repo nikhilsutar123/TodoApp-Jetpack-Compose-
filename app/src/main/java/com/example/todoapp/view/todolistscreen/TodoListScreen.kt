@@ -23,6 +23,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +47,15 @@ fun TodoListScreen(
     val snackBarHostState = remember {
         SnackbarHostState()
     }
+
+    val colorSaver = Saver<Color, FloatArray>(save = { color ->
+        floatArrayOf(
+            color.red,
+            color.green,
+            color.blue,
+            color.alpha
+        )
+    }, restore = { floats -> Color(floats[0], floats[1], floats[2], floats[3]) })
     LaunchedEffect(key1 = viewModel.uiEvent) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -108,7 +119,7 @@ fun TodoListScreen(
                 )
                 LazyColumn(modifier = Modifier.padding(it)) {
                     items(todos) { todo ->
-                        val bgColor = remember {
+                        val bgColor = rememberSaveable(saver = colorSaver) {
                             Color(
                                 red = Random.nextFloat() * 0.5f + 0.5f,
                                 green = Random.nextFloat() * 0.5f + 0.5f,

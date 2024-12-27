@@ -8,6 +8,7 @@ open class Constants {
 
         //args
         const val TODO_ID_ARG = "todoId"
+        const val PURPOSE_ARG = "purpose"
 
         //snackbar msgs
         const val TODO_DELETE_MSG = "Todo deleted"

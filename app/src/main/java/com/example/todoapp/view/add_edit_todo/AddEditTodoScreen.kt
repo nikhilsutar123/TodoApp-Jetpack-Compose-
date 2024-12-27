@@ -20,8 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import com.example.todoapp.util.Constants
 import com.example.todoapp.util.UiEvent
 import com.example.todoapp.view.todolistscreen.TodoListEvent
 import kotlin.math.max
@@ -29,11 +35,14 @@ import kotlin.math.max
 @Composable
 fun AddEditTodoScreen(
     onPopBackStack: () -> Unit,
-    viewModel: AddEditTodoViewModel = hiltViewModel()
+    viewModel: AddEditTodoViewModel = hiltViewModel(),
+    savedStateHandle: SavedStateHandle? = null
 ) {
     val snackBarHostState = remember {
         SnackbarHostState()
     }
+    val purpose = savedStateHandle?.get<String>(Constants.PURPOSE_ARG) ?: "add"
+    val title  = if(purpose == "edit") "Edit Todo" else "Add Todo"
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -45,7 +54,6 @@ fun AddEditTodoScreen(
                         duration = SnackbarDuration.Short
                     )
                 }
-
                 else -> Unit
             }
 
@@ -61,7 +69,13 @@ fun AddEditTodoScreen(
             }
         }) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            println("in addEditTodoScreen -> ${viewModel.title}, ${viewModel.desc}")
+            Text(
+                text = title,
+                textAlign = TextAlign.Start,
+                fontSize = TextUnit(value = 24f, type = TextUnitType.Sp),
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            Spacer(Modifier.height(16.dp))
             TextField(
                 value = viewModel.title,
                 onValueChange = { viewModel.onEvent(AddEditTodoEvent.OnTitleChange(it)) },
