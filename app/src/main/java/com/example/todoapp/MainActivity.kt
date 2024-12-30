@@ -36,12 +36,11 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = Routes.TODO_LIST) {
                     composable(Routes.TODO_LIST) {
                         TodoListScreen(onNavigate = {
-                            println("in mainActivity... ${it.route}")
                             navController.navigate(it.route)
                         })
                     }
                     composable(Routes.ADD_EDIT_TODO +
-                            "?${Constants.TODO_ID_ARG}={${Constants.TODO_ID_ARG}&${Constants.PURPOSE_ARG}={${Constants.PURPOSE_ARG}}",
+                            "?${Constants.TODO_ID_ARG}={${Constants.TODO_ID_ARG}}&${Constants.PURPOSE_ARG}={${Constants.PURPOSE_ARG}}",
                         arguments = listOf(
                             navArgument(
                                 name = Constants.TODO_ID_ARG
@@ -51,12 +50,16 @@ class MainActivity : ComponentActivity() {
                             },
                             navArgument(
                                 name = Constants.PURPOSE_ARG
-                            ){
+                            ) {
                                 type = NavType.StringType
                                 defaultValue = "add"
                             }
-                        )) {
-                        AddEditTodoScreen(onPopBackStack = { navController.popBackStack() })
+                        )) { backStackEntry ->
+                        val purpose =
+                            backStackEntry.arguments?.getString(Constants.PURPOSE_ARG) ?: "add"
+                        AddEditTodoScreen(
+                            purpose = purpose,
+                            onPopBackStack = { navController.popBackStack() })
                     }
                 }
             }

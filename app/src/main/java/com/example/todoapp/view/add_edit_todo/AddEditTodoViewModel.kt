@@ -37,13 +37,11 @@ class AddEditTodoViewModel @Inject constructor(
 
     init {
         val todoId = savedStateHandle.get<Int>(Constants.TODO_ID_ARG)!!
-        println("got todoId ${todoId}...")
         if (todoId != -1) {
             viewModelScope.launch {
                 repository.getTodoById(todoId)?.let { todo ->
                     title = todo.title
                     desc = todo.desc ?: ""
-                    println("got title & desc ${title}, ${desc}")
                     this@AddEditTodoViewModel.todo = todo
                 }
             }
@@ -72,7 +70,7 @@ class AddEditTodoViewModel @Inject constructor(
                     }
                     val newTodo = Todo(
                         title = title,
-                        desc = desc,
+                        desc = desc.trim(),
                         isDone = todo?.isDone ?: false,
                         id = todo?.id
                     )

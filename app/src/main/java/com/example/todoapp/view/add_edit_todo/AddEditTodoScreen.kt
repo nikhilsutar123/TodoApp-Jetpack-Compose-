@@ -35,13 +35,12 @@ import kotlin.math.max
 @Composable
 fun AddEditTodoScreen(
     onPopBackStack: () -> Unit,
+    purpose: String,
     viewModel: AddEditTodoViewModel = hiltViewModel(),
-    savedStateHandle: SavedStateHandle? = null
 ) {
     val snackBarHostState = remember {
         SnackbarHostState()
     }
-    val purpose = savedStateHandle?.get<String>(Constants.PURPOSE_ARG) ?: "add"
     val title  = if(purpose == "edit") "Edit Todo" else "Add Todo"
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
