@@ -5,6 +5,10 @@ open class Constants {
         const val DATABASE_VERSION = 3
         const val DATABASE_NAME = "todo_db"
         const val TODO_DELETE_ACTION = "UNDO"
+        const val TODO_ONGOING = "Ongoing"
+        const val TODO_COMPLETED = "Completed"
+        const val TODO_ONGOING_MSG = "No Ongoing Tasks!"
+        const val TODO_COMPLETED_MSG = "No Completed Tasks!"
 
         //args
         const val TODO_ID_ARG = "todoId"

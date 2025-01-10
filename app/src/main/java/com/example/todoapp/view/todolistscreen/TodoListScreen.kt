@@ -17,11 +17,15 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.todoapp.util.Constants
 import com.example.todoapp.util.UiEvent
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -47,6 +52,8 @@ fun TodoListScreen(
     val snackBarHostState = remember {
         SnackbarHostState()
     }
+
+    val (selectedTab, setSelectedTab) = remember { mutableIntStateOf(0) }
 
     val colorSaver = Saver<Color, FloatArray>(save = { color ->
         floatArrayOf(
@@ -73,7 +80,6 @@ fun TodoListScreen(
                 }
 
                 is UiEvent.Navigate -> {
-                    println("Navigation event: ${event.route}")
                     onNavigate(event)
                 }
 
@@ -92,55 +98,95 @@ fun TodoListScreen(
             }
         }
     ) {
-        if (todos.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "No Todos available. Add some Tasks!",
-                    softWrap = true,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize()
-            ) {
-                Text(
-                    text = "Todos",
-                    textAlign = TextAlign.Start,
-                    fontSize = TextUnit(value = 24f, type = TextUnitType.Sp),
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                LazyColumn(modifier = Modifier.padding(it)) {
-                    items(todos) { todo ->
-                        val bgColor = rememberSaveable(saver = colorSaver) {
-                            Color(
-                                red = Random.nextFloat() * 0.5f + 0.5f,
-                                green = Random.nextFloat() * 0.5f + 0.5f,
-                                blue = Random.nextFloat() * 0.5f + 0.5f,
-                                alpha = 1f
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            if (todos.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "No Todos available. Add some Tasks!",
+                        softWrap = true,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        text = "Todos",
+                        textAlign = TextAlign.Start,
+                        fontSize = TextUnit(value = 24f, type = TextUnitType.Sp),
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    TabRow(selectedTabIndex = selectedTab) {
+                        Tab(selected = selectedTab == 0, onClick = { setSelectedTab(0) }, text = {
+                            Text(
+                                text = Constants.TODO_ONGOING,
+                            )
+                        })
+                        Tab(selected = selectedTab == 1, onClick = { setSelectedTab(1) }, text = {
+                            Text(
+                                text = Constants.TODO_COMPLETED
+                            )
+                        })
+                    }
+                    val filteredTodos = when (selectedTab) {
+                        0 -> todos.filter { task -> !task.isDone }
+                        1 -> todos.filter { task -> task.isDone }
+                        else -> todos
+                    }
+                    if (filteredTodos.isNotEmpty()) {
+                        LazyColumn(modifier = Modifier.padding(it)) {
+                            items(filteredTodos) { todo ->
+                                val bgColor = rememberSaveable(saver = colorSaver) {
+                                    Color(
+                                        red = Random.nextFloat() * 0.5f + 0.5f,
+                                        green = Random.nextFloat() * 0.5f + 0.5f,
+                                        blue = Random.nextFloat() * 0.5f + 0.5f,
+                                        alpha = 1f
+                                    )
+                                }
+                                TodoListItem(
+                                    todo = todo,
+                                    onEvent = viewModel::onEvent,
+                                    modifier = Modifier
+                                        .clickable {
+                                            viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
+                                        }
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    backgroundColor = bgColor
+                                )
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (selectedTab == 0) Constants.TODO_ONGOING_MSG else Constants.TODO_COMPLETED_MSG,
+                                softWrap = true,
+                                textAlign = TextAlign.Center
                             )
                         }
-                        TodoListItem(
-                            todo = todo,
-                            onEvent = viewModel::onEvent,
-                            modifier = Modifier
-                                .clickable {
-                                    viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
-                                }
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            backgroundColor = bgColor
-                        )
                     }
+
                 }
-            }
+        }
+
 
     }
 
